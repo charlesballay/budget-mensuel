@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Budget Mensuel</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f4f4f1; color: #1a1a18; min-height: 100vh; }
+    header { background: #fff; border-bottom: 1px solid #e0ddd5; padding: 1rem 2rem; display: flex; align-items: center; gap: 12px; }
+    header h1 { font-size: 20px; font-weight: 500; }
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+    .view-toggle { display: flex; gap: 8px; margin-bottom: 1.5rem; }
+    .btn { padding: 7px 18px; font-size: 14px; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #fff; color: #5a5a56; transition: background 0.15s; }
+    .btn:hover { background: #eeecea; }
+    .btn.active { background: #eeecea; color: #1a1a18; font-weight: 500; border-color: #a8a5a0; }
+    .year-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .year-bar span { font-size: 13px; color: #888; font-weight: 500; }
+    .section-title { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+    .metric { background: #eeecea; border-radius: 8px; padding: 12px 14px; }
+    .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+    .metric-value { font-size: 22px; font-weight: 500; }
+    .positive { color: #0f6e56; }
+    .negative { color: #993c1d; }
+    .card { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+    .row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .row label { font-size: 13px; color: #888; width: 130px; flex-shrink: 0; }
+    .row input[type=number] { flex: 1; height: 36px; font-size: 14px; padding: 0 10px; border: 1px solid #c8c5bd; border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
+    .row input[type=number]:focus { border-color: #888; }
+    .save-btn { padding: 8px 22px; font-size: 14px; font-weight: 500; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #fff; color: #1a1a18; }
+    .save-btn:hover { background: #eeecea; }
+    .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+    .tab { padding: 5px 12px; font-size: 13px; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #fff; color: #888; }
+    .tab:hover { background: #eeecea; }
+    .tab.active { background: #eeecea; color: #1a1a18; font-weight: 500; border-color: #a8a5a0; }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .chart-card { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; }
+    .chart-title { font-size: 13px; color: #888; margin-bottom: 12px; font-weight: 500; }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; font-size: 12px; color: #888; }
+    .legend-item { display: flex; align-items: center; gap: 4px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+    .full-chart-card { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; margin-top: 1rem; }
+    @media (max-width: 650px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+  </svg>
+  <h1>Budget Mensuel</h1>
+</header>
+
+<main>
+
+  <div class="view-toggle">
+    <button class="btn active" id="btnMensuel" onclick="setView('mensuel')">Vue mensuelle</button>
+    <button class="btn" id="btnAnnuel" onclick="setView('annuel')">Vue annuelle</button>
+  </div>
+
+  <div class="year-bar">
+    <span>Année :</span>
+    <div class="tabs" id="yearTabs"></div>
+    <button class="btn" onclick="addYear()">+ Ajouter une année</button>
+  </div>
+
+  <!-- VUE MENSUELLE -->
+  <div id="viewMensuel">
+    <div class="tabs" id="monthTabs"></div>
+    <div class="metrics" id="metricsRow"></div>
+    <div class="card">
+      <div class="section-title">Saisir les données du mois</div>
+      <div class="row"><label>Revenus</label><input type="number" id="revenus" placeholder="ex: 2500" /></div>
+      <div class="row"><label>Logement</label><input type="number" id="logement" placeholder="ex: 800" /></div>
+      <div class="row"><label>Alimentation</label><input type="number" id="alimentation" placeholder="ex: 400" /></div>
+      <div class="row"><label>Transport</label><input type="number" id="transport" placeholder="ex: 150" /></div>
+      <div class="row"><label>Loisirs</label><input type="number" id="loisirs" placeholder="ex: 100" /></div>
+      <div class="row"><label>Santé</label><input type="number" id="sante" placeholder="ex: 80" /></div>
+      <div class="row"><label>Divers</label><input type="number" id="divers" placeholder="ex: 100" /></div>
+      <div class="row" style="margin-top:14px">
+        <button class="save-btn" onclick="saveMonth()">Enregistrer ce mois</button>
+        <span id="saveMsg" style="font-size:13px; color:#0f6e56; margin-left:8px;"></span>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Revenus vs Dépenses (mois)</div>
+        <div style="position:relative;height:220px"><canvas id="chartBar"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Répartition des dépenses</div>
+        <div id="pieLegend" class="legend"></div>
+        <div style="position:relative;height:190px"><canvas id="chartPie"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VUE ANNUELLE -->
+  <div id="viewAnnuel" style="display:none">
+    <div class="metrics" id="metricsAnnuel"></div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Revenus vs Dépenses par année</div>
+        <div class="legend" id="annualLegend"></div>
+        <div style="position:relative;height:240px"><canvas id="chartAnnualBar"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Épargne par année</div>
+        <div style="position:relative;height:240px"><canvas id="chartAnnualEpargne"></canvas></div>
+      </div>
+    </div>
+    <div class="full-chart-card">
+      <div class="chart-title">Évolution mensuelle — comparaison des années</div>
+      <div id="lineAnnualLegend" class="legend"></div>
+      <div style="position:relative;height:260px"><canvas id="chartAnnualLine"></canvas></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const CATS = ['logement','alimentation','transport','loisirs','sante','divers'];
+  const CAT_LABELS = ['Logement','Alimentation','Transport','Loisirs','Santé','Divers'];
+  const PIE_COLORS = ['#378ADD','#1D9E75','#BA7517','#D4537E','#534AB7','#888780'];
+  const YEAR_COLORS = ['#378ADD','#1D9E75','#BA7517','#D4537E','#534AB7','#E24B4A'];
+
+  const curYear = new Date().getFullYear();
+  let years = [curYear - 1, curYear];
+  let currentYear = curYear;
+  let currentMonth = new Date().getMonth();
+  let currentView = 'mensuel';
+  let data = {};
+
+  function key(y, m) { return `budget_${y}_${m}`; }
+
+  function loadAll() {
+    years.forEach(y => {
+      data[y] = {};
+      for (let m = 0; m < 12; m++) {
+        const s = localStorage.getItem(key(y, m));
+        if (s) data[y][m] = JSON.parse(s);
+      }
+    });
+  }
+
+  function saveMonthData(y, m, obj) {
+    if (!data[y]) data[y] = {};
+    data[y][m] = obj;
+    localStorage.setItem(key(y, m), JSON.stringify(obj));
+  }
+
+  function totalDep(d) { return d ? CATS.reduce((s, c) => s + (d[c] || 0), 0) : 0; }
+
+  function yearTotals(y) {
+    let rev = 0, dep = 0;
+    for (let m = 0; m < 12; m++) {
+      const d = (data[y] || {})[m];
+      if (d) { rev += d.revenus || 0; dep += totalDep(d); }
+    }
+    return { rev, dep, epargne: rev - dep };
+  }
+
+  function addYear() {
+    const last = Math.max(...years);
+    const next = last + 1;
+    if (!years.includes(next)) {
+      years.push(next);
+      years.sort();
+      data[next] = {};
+      buildYearTabs();
+    }
+  }
+
+  function setView(v) {
+    currentView = v;
+    document.getElementById('viewMensuel').style.display = v === 'mensuel' ? '' : 'none';
+    document.getElementById('viewAnnuel').style.display = v === 'annuel' ? '' : 'none';
+    document.getElementById('btnMensuel').className = 'btn' + (v === 'mensuel' ? ' active' : '');
+    document.getElementById('btnAnnuel').className = 'btn' + (v === 'annuel' ? ' active' : '');
+    if (v === 'annuel') { renderAnnualCharts(); updateAnnualMetrics(); }
+    else { renderCharts(); updateMetrics(); }
+  }
+
+  function buildYearTabs() {
+    const c = document.getElementById('yearTabs');
+    c.innerHTML = '';
+    years.forEach(y => {
+      const btn = document.createElement('button');
+      btn.className = 'tab' + (y === currentYear ? ' active' : '');
+      btn.textContent = y;
+      btn.onclick = () => {
+        currentYear = y;
+        buildYearTabs(); buildMonthTabs(); loadForm(); updateMetrics(); renderCharts();
+        if (currentView === 'annuel') { renderAnnualCharts(); updateAnnualMetrics(); }
+      };
+      c.appendChild(btn);
+    });
+  }
+
+  function buildMonthTabs() {
+    const c = document.getElementById('monthTabs');
+    c.innerHTML = '';
+    MONTHS.forEach((name, i) => {
+      const btn = document.createElement('button');
+      const hasData = !!(data[currentYear] || {})[i];
+      btn.className = 'tab' + (i === currentMonth ? ' active' : '');
+      btn.textContent = name + (hasData ? ' ✓' : '');
+      btn.onclick = () => { currentMonth = i; buildMonthTabs(); loadForm(); updateMetrics(); renderCharts(); };
+      c.appendChild(btn);
+    });
+  }
+
+  function loadForm() {
+    const d = (data[currentYear] || {})[currentMonth] || {};
+    document.getElementById('revenus').value = d.revenus || '';
+    CATS.forEach(c => { document.getElementById(c).value = d[c] || ''; });
+  }
+
+  function getForm() {
+    const obj = { revenus: parseFloat(document.getElementById('revenus').value) || 0 };
+    CATS.forEach(c => { obj[c] = parseFloat(document.getElementById(c).value) || 0; });
+    return obj;
+  }
+
+  function saveMonth() {
+    saveMonthData(currentYear, currentMonth, getForm());
+    buildMonthTabs(); updateMetrics(); renderCharts();
+    const msg = document.getElementById('saveMsg');
+    msg.textContent = 'Sauvegardé !';
+    setTimeout(() => msg.textContent = '', 2000);
+  }
+
+  function updateMetrics() {
+    const d = (data[currentYear] || {})[currentMonth] || {};
+    const rev = d.revenus || 0, dep = totalDep(d), ep = rev - dep;
+    const taux = rev > 0 ? ((ep / rev) * 100).toFixed(1) : '—';
+    document.getElementById('metricsRow').innerHTML = `
+      <div class="metric"><div class="metric-label">Revenus (${MONTHS[currentMonth]})</div><div class="metric-value">${rev.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Dépenses (${MONTHS[currentMonth]})</div><div class="metric-value negative">${dep.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Épargne</div><div class="metric-value ${ep >= 0 ? 'positive' : 'negative'}">${ep >= 0 ? '+' : ''}${ep.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Taux d'épargne</div><div class="metric-value ${parseFloat(taux) >= 0 ? 'positive' : 'negative'}">${taux}%</div></div>`;
+  }
+
+  function updateAnnualMetrics() {
+    const t = yearTotals(currentYear);
+    const taux = t.rev > 0 ? ((t.epargne / t.rev) * 100).toFixed(1) : '—';
+    document.getElementById('metricsAnnuel').innerHTML = `
+      <div class="metric"><div class="metric-label">Revenus ${currentYear}</div><div class="metric-value">${t.rev.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Dépenses ${currentYear}</div><div class="metric-value negative">${t.dep.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Épargne ${currentYear}</div><div class="metric-value ${t.epargne >= 0 ? 'positive' : 'negative'}">${t.epargne >= 0 ? '+' : ''}${t.epargne.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Taux d'épargne</div><div class="metric-value ${parseFloat(taux) >= 0 ? 'positive' : 'negative'}">${taux}%</div></div>`;
+  }
+
+  let barChart, pieChart, annualBar, annualEpargne, annualLine;
+
+  function renderCharts() {
+    const yData = data[currentYear] || {};
+    const labels = [], revs = [], deps = [];
+    MONTHS.forEach((name, i) => {
+      if (yData[i]) { labels.push(name); revs.push(yData[i].revenus || 0); deps.push(totalDep(yData[i])); }
+    });
+    if (barChart) barChart.destroy();
+    barChart = new Chart(document.getElementById('chartBar'), {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Revenus', data: revs, backgroundColor: '#378ADD' }, { label: 'Dépenses', data: deps, backgroundColor: '#E24B4A' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: { ticks: { autoSkip: false, font: { size: 11 } } } } }
+    });
+    const d = yData[currentMonth] || {};
+    const pieData = CATS.map(c => d[c] || 0);
+    document.getElementById('pieLegend').innerHTML = PIE_COLORS.map((col, i) =>
+      `<span class="legend-item"><span class="legend-dot" style="background:${col}"></span>${CAT_LABELS[i]}</span>`).join('');
+    if (pieChart) pieChart.destroy();
+    pieChart = new Chart(document.getElementById('chartPie'), {
+      type: 'doughnut',
+      data: { labels: CAT_LABELS, datasets: [{ data: pieData, backgroundColor: PIE_COLORS }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+  }
+
+  function renderAnnualCharts() {
+    const yLabels = years.map(String);
+    const revs = years.map(y => yearTotals(y).rev);
+    const deps = years.map(y => yearTotals(y).dep);
+    const eps = years.map(y => yearTotals(y).epargne);
+    document.getElementById('annualLegend').innerHTML = `
+      <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Revenus</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#E24B4A"></span>Dépenses</span>`;
+    if (annualBar) annualBar.destroy();
+    annualBar = new Chart(document.getElementById('chartAnnualBar'), {
+      type: 'bar',
+      data: { labels: yLabels, datasets: [{ label: 'Revenus', data: revs, backgroundColor: '#378ADD' }, { label: 'Dépenses', data: deps, backgroundColor: '#E24B4A' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    if (annualEpargne) annualEpargne.destroy();
+    annualEpargne = new Chart(document.getElementById('chartAnnualEpargne'), {
+      type: 'bar',
+      data: { labels: yLabels, datasets: [{ label: 'Épargne', data: eps, backgroundColor: eps.map(v => v >= 0 ? '#1D9E75' : '#E24B4A') }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    const lineDatasets = years.map((y, idx) => {
+      const yData = data[y] || {};
+      return { label: String(y), data: MONTHS.map((_, m) => yData[m] ? totalDep(yData[m]) : null), borderColor: YEAR_COLORS[idx % YEAR_COLORS.length], backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, spanGaps: false };
+    });
+    document.getElementById('lineAnnualLegend').innerHTML = years.map((y, i) =>
+      `<span class="legend-item"><span class="legend-dot" style="background:${YEAR_COLORS[i % YEAR_COLORS.length]}"></span>${y}</span>`).join('');
+    if (annualLine) annualLine.destroy();
+    annualLine = new Chart(document.getElementById('chartAnnualLine'), {
+      type: 'line',
+      data: { labels: MONTHS, datasets: lineDatasets },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { autoSkip: false, font: { size: 11 } } } } }
+    });
+  }
+
+  loadAll();
+  buildYearTabs();
+  buildMonthTabs();
+  loadForm();
+  updateMetrics();
+  renderCharts();
+</script>
+</body>
+</html>

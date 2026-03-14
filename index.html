@@ -8,8 +8,39 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #f4f4f1; color: #1a1a18; min-height: 100vh; }
+
+    /* ÉCRAN DE CONNEXION */
+    #loginScreen {
+      position: fixed; inset: 0; background: #f4f4f1;
+      display: flex; align-items: center; justify-content: center; z-index: 999;
+    }
+    .login-card {
+      background: #fff; border: 1px solid #e0ddd5; border-radius: 16px;
+      padding: 2.5rem 2rem; width: 100%; max-width: 360px; text-align: center;
+    }
+    .login-card h2 { font-size: 20px; font-weight: 500; margin-bottom: 0.4rem; }
+    .login-card p { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+    .login-card input[type=password] {
+      width: 100%; height: 40px; font-size: 15px; padding: 0 12px;
+      border: 1px solid #c8c5bd; border-radius: 8px; background: #fff;
+      color: #1a1a18; outline: none; margin-bottom: 10px; text-align: center;
+      letter-spacing: 0.1em;
+    }
+    .login-card input[type=password]:focus { border-color: #888; }
+    .login-btn {
+      width: 100%; padding: 10px; font-size: 14px; font-weight: 500;
+      border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer;
+      background: #eeecea; color: #1a1a18;
+    }
+    .login-btn:hover { background: #e0ddd5; }
+    #loginError { font-size: 13px; color: #993c1d; margin-top: 10px; min-height: 18px; }
+
+    /* APP */
+    #app { display: none; }
     header { background: #fff; border-bottom: 1px solid #e0ddd5; padding: 1rem 2rem; display: flex; align-items: center; gap: 12px; }
-    header h1 { font-size: 20px; font-weight: 500; }
+    header h1 { font-size: 20px; font-weight: 500; flex: 1; }
+    .logout-btn { font-size: 13px; color: #888; cursor: pointer; border: 1px solid #c8c5bd; border-radius: 8px; padding: 5px 12px; background: #fff; }
+    .logout-btn:hover { background: #eeecea; }
     main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
     .view-toggle { display: flex; gap: 8px; margin-bottom: 1.5rem; }
     .btn { padding: 7px 18px; font-size: 14px; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #fff; color: #5a5a56; transition: background 0.15s; }
@@ -50,81 +81,123 @@
 </head>
 <body>
 
-<header>
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
-  </svg>
-  <h1>Budget Mensuel</h1>
-</header>
-
-<main>
-
-  <div class="view-toggle">
-    <button class="btn active" id="btnMensuel" onclick="setView('mensuel')">Vue mensuelle</button>
-    <button class="btn" id="btnAnnuel" onclick="setView('annuel')">Vue annuelle</button>
+<!-- ÉCRAN DE CONNEXION -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h2>Budget Mensuel</h2>
+    <p>Entrez votre mot de passe pour accéder</p>
+    <input type="password" id="pwdInput" placeholder="••••••••••" onkeydown="if(event.key==='Enter') checkPwd()" autofocus />
+    <button class="login-btn" onclick="checkPwd()">Accéder</button>
+    <div id="loginError"></div>
   </div>
+</div>
 
-  <div class="year-bar">
-    <span>Année :</span>
-    <div class="tabs" id="yearTabs"></div>
-    <button class="btn" onclick="addYear()">+ Ajouter une année</button>
-  </div>
+<!-- APPLICATION -->
+<div id="app">
+  <header>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D9E75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+    </svg>
+    <h1>Budget Mensuel</h1>
+    <button class="logout-btn" onclick="logout()">Se déconnecter</button>
+  </header>
 
-  <!-- VUE MENSUELLE -->
-  <div id="viewMensuel">
-    <div class="tabs" id="monthTabs"></div>
-    <div class="metrics" id="metricsRow"></div>
-    <div class="card">
-      <div class="section-title">Saisir les données du mois</div>
-      <div class="row"><label>Revenus</label><input type="number" id="revenus" placeholder="ex: 2500" /></div>
-      <div class="row"><label>Logement</label><input type="number" id="logement" placeholder="ex: 800" /></div>
-      <div class="row"><label>Alimentation</label><input type="number" id="alimentation" placeholder="ex: 400" /></div>
-      <div class="row"><label>Transport</label><input type="number" id="transport" placeholder="ex: 150" /></div>
-      <div class="row"><label>Loisirs</label><input type="number" id="loisirs" placeholder="ex: 100" /></div>
-      <div class="row"><label>Santé</label><input type="number" id="sante" placeholder="ex: 80" /></div>
-      <div class="row"><label>Divers</label><input type="number" id="divers" placeholder="ex: 100" /></div>
-      <div class="row" style="margin-top:14px">
-        <button class="save-btn" onclick="saveMonth()">Enregistrer ce mois</button>
-        <span id="saveMsg" style="font-size:13px; color:#0f6e56; margin-left:8px;"></span>
+  <main>
+    <div class="view-toggle">
+      <button class="btn active" id="btnMensuel" onclick="setView('mensuel')">Vue mensuelle</button>
+      <button class="btn" id="btnAnnuel" onclick="setView('annuel')">Vue annuelle</button>
+    </div>
+
+    <div class="year-bar">
+      <span>Année :</span>
+      <div class="tabs" id="yearTabs"></div>
+      <button class="btn" onclick="addYear()">+ Ajouter une année</button>
+    </div>
+
+    <!-- VUE MENSUELLE -->
+    <div id="viewMensuel">
+      <div class="tabs" id="monthTabs"></div>
+      <div class="metrics" id="metricsRow"></div>
+      <div class="card">
+        <div class="section-title">Saisir les données du mois</div>
+        <div class="row"><label>Revenus</label><input type="number" id="revenus" placeholder="ex: 2500" /></div>
+        <div class="row"><label>Logement</label><input type="number" id="logement" placeholder="ex: 800" /></div>
+        <div class="row"><label>Alimentation</label><input type="number" id="alimentation" placeholder="ex: 400" /></div>
+        <div class="row"><label>Transport</label><input type="number" id="transport" placeholder="ex: 150" /></div>
+        <div class="row"><label>Loisirs</label><input type="number" id="loisirs" placeholder="ex: 100" /></div>
+        <div class="row"><label>Santé</label><input type="number" id="sante" placeholder="ex: 80" /></div>
+        <div class="row"><label>Divers</label><input type="number" id="divers" placeholder="ex: 100" /></div>
+        <div class="row" style="margin-top:14px">
+          <button class="save-btn" onclick="saveMonth()">Enregistrer ce mois</button>
+          <span id="saveMsg" style="font-size:13px; color:#0f6e56; margin-left:8px;"></span>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Revenus vs Dépenses (mois)</div>
+          <div style="position:relative;height:220px"><canvas id="chartBar"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Répartition des dépenses</div>
+          <div id="pieLegend" class="legend"></div>
+          <div style="position:relative;height:190px"><canvas id="chartPie"></canvas></div>
+        </div>
       </div>
     </div>
-    <div class="charts-grid">
-      <div class="chart-card">
-        <div class="chart-title">Revenus vs Dépenses (mois)</div>
-        <div style="position:relative;height:220px"><canvas id="chartBar"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-title">Répartition des dépenses</div>
-        <div id="pieLegend" class="legend"></div>
-        <div style="position:relative;height:190px"><canvas id="chartPie"></canvas></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- VUE ANNUELLE -->
-  <div id="viewAnnuel" style="display:none">
-    <div class="metrics" id="metricsAnnuel"></div>
-    <div class="charts-grid">
-      <div class="chart-card">
-        <div class="chart-title">Revenus vs Dépenses par année</div>
-        <div class="legend" id="annualLegend"></div>
-        <div style="position:relative;height:240px"><canvas id="chartAnnualBar"></canvas></div>
+    <!-- VUE ANNUELLE -->
+    <div id="viewAnnuel" style="display:none">
+      <div class="metrics" id="metricsAnnuel"></div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-title">Revenus vs Dépenses par année</div>
+          <div class="legend" id="annualLegend"></div>
+          <div style="position:relative;height:240px"><canvas id="chartAnnualBar"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Épargne par année</div>
+          <div style="position:relative;height:240px"><canvas id="chartAnnualEpargne"></canvas></div>
+        </div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title">Épargne par année</div>
-        <div style="position:relative;height:240px"><canvas id="chartAnnualEpargne"></canvas></div>
+      <div class="full-chart-card">
+        <div class="chart-title">Évolution mensuelle — comparaison des années</div>
+        <div id="lineAnnualLegend" class="legend"></div>
+        <div style="position:relative;height:260px"><canvas id="chartAnnualLine"></canvas></div>
       </div>
     </div>
-    <div class="full-chart-card">
-      <div class="chart-title">Évolution mensuelle — comparaison des années</div>
-      <div id="lineAnnualLegend" class="legend"></div>
-      <div style="position:relative;height:260px"><canvas id="chartAnnualLine"></canvas></div>
-    </div>
-  </div>
-
-</main>
+  </main>
+</div>
 
 <script>
+  const CORRECT = "Arbr3&197677";
+
+  function checkPwd() {
+    const val = document.getElementById('pwdInput').value;
+    if (val === CORRECT) {
+      sessionStorage.setItem('budget_auth', '1');
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      init();
+    } else {
+      document.getElementById('loginError').textContent = 'Mot de passe incorrect.';
+      document.getElementById('pwdInput').value = '';
+      document.getElementById('pwdInput').focus();
+    }
+  }
+
+  function logout() {
+    sessionStorage.removeItem('budget_auth');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('loginError').textContent = '';
+  }
+
+  if (sessionStorage.getItem('budget_auth') === '1') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+
   const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
   const CATS = ['logement','alimentation','transport','loisirs','sante','divers'];
   const CAT_LABELS = ['Logement','Alimentation','Transport','Loisirs','Santé','Divers'];
@@ -171,9 +244,7 @@
     const last = Math.max(...years);
     const next = last + 1;
     if (!years.includes(next)) {
-      years.push(next);
-      years.sort();
-      data[next] = {};
+      years.push(next); years.sort(); data[next] = {};
       buildYearTabs();
     }
   }
@@ -189,29 +260,22 @@
   }
 
   function buildYearTabs() {
-    const c = document.getElementById('yearTabs');
-    c.innerHTML = '';
+    const c = document.getElementById('yearTabs'); c.innerHTML = '';
     years.forEach(y => {
       const btn = document.createElement('button');
       btn.className = 'tab' + (y === currentYear ? ' active' : '');
       btn.textContent = y;
-      btn.onclick = () => {
-        currentYear = y;
-        buildYearTabs(); buildMonthTabs(); loadForm(); updateMetrics(); renderCharts();
-        if (currentView === 'annuel') { renderAnnualCharts(); updateAnnualMetrics(); }
-      };
+      btn.onclick = () => { currentYear = y; buildYearTabs(); buildMonthTabs(); loadForm(); updateMetrics(); renderCharts(); if (currentView === 'annuel') { renderAnnualCharts(); updateAnnualMetrics(); } };
       c.appendChild(btn);
     });
   }
 
   function buildMonthTabs() {
-    const c = document.getElementById('monthTabs');
-    c.innerHTML = '';
+    const c = document.getElementById('monthTabs'); c.innerHTML = '';
     MONTHS.forEach((name, i) => {
       const btn = document.createElement('button');
-      const hasData = !!(data[currentYear] || {})[i];
       btn.className = 'tab' + (i === currentMonth ? ' active' : '');
-      btn.textContent = name + (hasData ? ' ✓' : '');
+      btn.textContent = name + (!!(data[currentYear] || {})[i] ? ' ✓' : '');
       btn.onclick = () => { currentMonth = i; buildMonthTabs(); loadForm(); updateMetrics(); renderCharts(); };
       c.appendChild(btn);
     });
@@ -263,9 +327,7 @@
   function renderCharts() {
     const yData = data[currentYear] || {};
     const labels = [], revs = [], deps = [];
-    MONTHS.forEach((name, i) => {
-      if (yData[i]) { labels.push(name); revs.push(yData[i].revenus || 0); deps.push(totalDep(yData[i])); }
-    });
+    MONTHS.forEach((name, i) => { if (yData[i]) { labels.push(name); revs.push(yData[i].revenus || 0); deps.push(totalDep(yData[i])); } });
     if (barChart) barChart.destroy();
     barChart = new Chart(document.getElementById('chartBar'), {
       type: 'bar',
@@ -273,13 +335,12 @@
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: { ticks: { autoSkip: false, font: { size: 11 } } } } }
     });
     const d = yData[currentMonth] || {};
-    const pieData = CATS.map(c => d[c] || 0);
     document.getElementById('pieLegend').innerHTML = PIE_COLORS.map((col, i) =>
       `<span class="legend-item"><span class="legend-dot" style="background:${col}"></span>${CAT_LABELS[i]}</span>`).join('');
     if (pieChart) pieChart.destroy();
     pieChart = new Chart(document.getElementById('chartPie'), {
       type: 'doughnut',
-      data: { labels: CAT_LABELS, datasets: [{ data: pieData, backgroundColor: PIE_COLORS }] },
+      data: { labels: CAT_LABELS, datasets: [{ data: CATS.map(c => d[c] || 0), backgroundColor: PIE_COLORS }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
   }
@@ -304,26 +365,21 @@
       data: { labels: yLabels, datasets: [{ label: 'Épargne', data: eps, backgroundColor: eps.map(v => v >= 0 ? '#1D9E75' : '#E24B4A') }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
-    const lineDatasets = years.map((y, idx) => {
-      const yData = data[y] || {};
-      return { label: String(y), data: MONTHS.map((_, m) => yData[m] ? totalDep(yData[m]) : null), borderColor: YEAR_COLORS[idx % YEAR_COLORS.length], backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, spanGaps: false };
-    });
     document.getElementById('lineAnnualLegend').innerHTML = years.map((y, i) =>
       `<span class="legend-item"><span class="legend-dot" style="background:${YEAR_COLORS[i % YEAR_COLORS.length]}"></span>${y}</span>`).join('');
     if (annualLine) annualLine.destroy();
     annualLine = new Chart(document.getElementById('chartAnnualLine'), {
       type: 'line',
-      data: { labels: MONTHS, datasets: lineDatasets },
+      data: { labels: MONTHS, datasets: years.map((y, idx) => ({ label: String(y), data: MONTHS.map((_, m) => (data[y] || {})[m] ? totalDep((data[y] || {})[m]) : null), borderColor: YEAR_COLORS[idx % YEAR_COLORS.length], backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, spanGaps: false })) },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { autoSkip: false, font: { size: 11 } } } } }
     });
   }
 
-  loadAll();
-  buildYearTabs();
-  buildMonthTabs();
-  loadForm();
-  updateMetrics();
-  renderCharts();
+  function init() {
+    loadAll(); buildYearTabs(); buildMonthTabs(); loadForm(); updateMetrics(); renderCharts();
+  }
+
+  if (sessionStorage.getItem('budget_auth') === '1') init();
 </script>
 </body>
 </html>

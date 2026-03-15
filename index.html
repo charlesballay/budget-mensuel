@@ -9,7 +9,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, sans-serif; background: #f4f4f1; color: #1a1a18; min-height: 100vh; }
 
-    /* ÉCRAN DE CONNEXION */
     #loginScreen {
       position: fixed; inset: 0; background: #f4f4f1;
       display: flex; align-items: center; justify-content: center; z-index: 999;
@@ -23,19 +22,13 @@
     .login-card input[type=password] {
       width: 100%; height: 40px; font-size: 15px; padding: 0 12px;
       border: 1px solid #c8c5bd; border-radius: 8px; background: #fff;
-      color: #1a1a18; outline: none; margin-bottom: 10px; text-align: center;
-      letter-spacing: 0.1em;
+      color: #1a1a18; outline: none; margin-bottom: 10px; text-align: center; letter-spacing: 0.1em;
     }
     .login-card input[type=password]:focus { border-color: #888; }
-    .login-btn {
-      width: 100%; padding: 10px; font-size: 14px; font-weight: 500;
-      border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer;
-      background: #eeecea; color: #1a1a18;
-    }
+    .login-btn { width: 100%; padding: 10px; font-size: 14px; font-weight: 500; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #eeecea; color: #1a1a18; }
     .login-btn:hover { background: #e0ddd5; }
     #loginError { font-size: 13px; color: #993c1d; margin-top: 10px; min-height: 18px; }
 
-    /* APP */
     #app { display: none; }
     header { background: #fff; border-bottom: 1px solid #e0ddd5; padding: 1rem 2rem; display: flex; align-items: center; gap: 12px; }
     header h1 { font-size: 20px; font-weight: 500; flex: 1; }
@@ -47,20 +40,27 @@
     .btn:hover { background: #eeecea; }
     .btn.active { background: #eeecea; color: #1a1a18; font-weight: 500; border-color: #a8a5a0; }
     .year-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .year-bar span { font-size: 13px; color: #888; font-weight: 500; }
+    .year-bar > span { font-size: 13px; color: #888; font-weight: 500; }
     .section-title { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
     .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
     .metric { background: #eeecea; border-radius: 8px; padding: 12px 14px; }
     .metric-label { font-size: 12px; color: #888; margin-bottom: 4px; }
-    .metric-value { font-size: 22px; font-weight: 500; }
+    .metric-value { font-size: 20px; font-weight: 500; }
     .positive { color: #0f6e56; }
     .negative { color: #993c1d; }
     .card { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
-    .row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .row label { font-size: 13px; color: #888; width: 130px; flex-shrink: 0; }
-    .row input[type=number] { flex: 1; height: 36px; font-size: 14px; padding: 0 10px; border: 1px solid #c8c5bd; border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .subsection-title { font-size: 12px; font-weight: 500; color: #888; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #e0ddd5; }
+    .subsection-title.rev { color: #0f6e56; border-color: #9FE1CB; }
+    .subsection-title.dep { color: #993c1d; border-color: #F5C4B3; }
+    .row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .row label { font-size: 13px; color: #555; width: 160px; flex-shrink: 0; }
+    .row input[type=number] { flex: 1; height: 34px; font-size: 14px; padding: 0 10px; border: 1px solid #c8c5bd; border-radius: 8px; background: #fff; color: #1a1a18; outline: none; }
     .row input[type=number]:focus { border-color: #888; }
-    .save-btn { padding: 8px 22px; font-size: 14px; font-weight: 500; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #fff; color: #1a1a18; }
+    .total-row { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; margin-top: 4px; border-top: 1px solid #e0ddd5; }
+    .total-label { font-size: 13px; font-weight: 500; color: #888; }
+    .total-value { font-size: 15px; font-weight: 500; }
+    .save-btn { padding: 8px 22px; font-size: 14px; font-weight: 500; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #fff; color: #1a1a18; margin-top: 1rem; }
     .save-btn:hover { background: #eeecea; }
     .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
     .tab { padding: 5px 12px; font-size: 13px; border: 1px solid #c8c5bd; border-radius: 8px; cursor: pointer; background: #fff; color: #888; }
@@ -73,9 +73,10 @@
     .legend-item { display: flex; align-items: center; gap: 4px; }
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
     .full-chart-card { background: #fff; border: 1px solid #e0ddd5; border-radius: 12px; padding: 1rem 1.25rem; margin-top: 1rem; }
-    @media (max-width: 650px) {
+    @media (max-width: 700px) {
       .metrics { grid-template-columns: 1fr 1fr; }
       .charts-grid { grid-template-columns: 1fr; }
+      .two-cols { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -118,20 +119,45 @@
     <div id="viewMensuel">
       <div class="tabs" id="monthTabs"></div>
       <div class="metrics" id="metricsRow"></div>
+
       <div class="card">
-        <div class="section-title">Saisir les données du mois</div>
-        <div class="row"><label>Revenus</label><input type="number" id="revenus" placeholder="ex: 2500" /></div>
-        <div class="row"><label>Logement</label><input type="number" id="logement" placeholder="ex: 800" /></div>
-        <div class="row"><label>Alimentation</label><input type="number" id="alimentation" placeholder="ex: 400" /></div>
-        <div class="row"><label>Transport</label><input type="number" id="transport" placeholder="ex: 150" /></div>
-        <div class="row"><label>Loisirs</label><input type="number" id="loisirs" placeholder="ex: 100" /></div>
-        <div class="row"><label>Santé</label><input type="number" id="sante" placeholder="ex: 80" /></div>
-        <div class="row"><label>Divers</label><input type="number" id="divers" placeholder="ex: 100" /></div>
-        <div class="row" style="margin-top:14px">
-          <button class="save-btn" onclick="saveMonth()">Enregistrer ce mois</button>
-          <span id="saveMsg" style="font-size:13px; color:#0f6e56; margin-left:8px;"></span>
+        <div class="two-cols">
+          <!-- REVENUS -->
+          <div>
+            <div class="subsection-title rev">Revenus</div>
+            <div class="row"><label>Salaire</label><input type="number" id="salaire" placeholder="ex: 2500" oninput="updateTotals()" /></div>
+            <div class="row"><label>Dividendes et intérêts</label><input type="number" id="dividendes" placeholder="ex: 200" oninput="updateTotals()" /></div>
+            <div class="row"><label>Aides</label><input type="number" id="aides" placeholder="ex: 100" oninput="updateTotals()" /></div>
+            <div class="row"><label>Autres revenus</label><input type="number" id="autres_rev" placeholder="ex: 50" oninput="updateTotals()" /></div>
+            <div class="total-row">
+              <span class="total-label">Total revenus</span>
+              <span class="total-value positive" id="totalRevDisplay">0 €</span>
+            </div>
+          </div>
+          <!-- DÉPENSES -->
+          <div>
+            <div class="subsection-title dep">Dépenses</div>
+            <div class="row"><label>Logement</label><input type="number" id="logement" placeholder="ex: 800" oninput="updateTotals()" /></div>
+            <div class="row"><label>Alimentation</label><input type="number" id="alimentation" placeholder="ex: 400" oninput="updateTotals()" /></div>
+            <div class="row"><label>Transport</label><input type="number" id="transport" placeholder="ex: 150" oninput="updateTotals()" /></div>
+            <div class="row"><label>Loisirs</label><input type="number" id="loisirs" placeholder="ex: 100" oninput="updateTotals()" /></div>
+            <div class="row"><label>Achats</label><input type="number" id="achats" placeholder="ex: 150" oninput="updateTotals()" /></div>
+            <div class="row"><label>Santé</label><input type="number" id="sante" placeholder="ex: 80" oninput="updateTotals()" /></div>
+            <div class="row"><label>Virements émis</label><input type="number" id="virements" placeholder="ex: 200" oninput="updateTotals()" /></div>
+            <div class="row"><label>Autres dépenses</label><input type="number" id="autres_dep1" placeholder="ex: 50" oninput="updateTotals()" /></div>
+            <div class="row"><label>Autres dépenses (2)</label><input type="number" id="autres_dep2" placeholder="ex: 50" oninput="updateTotals()" /></div>
+            <div class="total-row">
+              <span class="total-label">Total dépenses</span>
+              <span class="total-value negative" id="totalDepDisplay">0 €</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem; margin-top:1rem; padding-top:1rem; border-top:1px solid #e0ddd5;">
+          <button class="save-btn" onclick="saveMonth()" style="margin-top:0">Enregistrer ce mois</button>
+          <span id="saveMsg" style="font-size:13px; color:#0f6e56;"></span>
         </div>
       </div>
+
       <div class="charts-grid">
         <div class="chart-card">
           <div class="chart-title">Revenus vs Dépenses (mois)</div>
@@ -142,6 +168,11 @@
           <div id="pieLegend" class="legend"></div>
           <div style="position:relative;height:190px"><canvas id="chartPie"></canvas></div>
         </div>
+      </div>
+      <div class="full-chart-card" style="margin-top:1rem">
+        <div class="chart-title">Répartition des revenus</div>
+        <div id="pieRevLegend" class="legend"></div>
+        <div style="position:relative;height:200px"><canvas id="chartPieRev"></canvas></div>
       </div>
     </div>
 
@@ -160,7 +191,7 @@
         </div>
       </div>
       <div class="full-chart-card">
-        <div class="chart-title">Évolution mensuelle — comparaison des années</div>
+        <div class="chart-title">Évolution mensuelle des dépenses — comparaison des années</div>
         <div id="lineAnnualLegend" class="legend"></div>
         <div style="position:relative;height:260px"><canvas id="chartAnnualLine"></canvas></div>
       </div>
@@ -198,10 +229,17 @@
     document.getElementById('app').style.display = 'block';
   }
 
+  // Catégories revenus
+  const REV_CATS = ['salaire','dividendes','aides','autres_rev'];
+  const REV_LABELS = ['Salaire','Dividendes et intérêts','Aides','Autres revenus'];
+  const REV_COLORS = ['#1D9E75','#378ADD','#BA7517','#888780'];
+
+  // Catégories dépenses
+  const DEP_CATS = ['logement','alimentation','transport','loisirs','achats','sante','virements','autres_dep1','autres_dep2'];
+  const DEP_LABELS = ['Logement','Alimentation','Transport','Loisirs','Achats','Santé','Virements émis','Autres dépenses','Autres dépenses (2)'];
+  const DEP_COLORS = ['#378ADD','#1D9E75','#BA7517','#D4537E','#534AB7','#E24B4A','#888780','#5DCAA5','#F09595'];
+
   const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-  const CATS = ['logement','alimentation','transport','loisirs','sante','divers'];
-  const CAT_LABELS = ['Logement','Alimentation','Transport','Loisirs','Santé','Divers'];
-  const PIE_COLORS = ['#378ADD','#1D9E75','#BA7517','#D4537E','#534AB7','#888780'];
   const YEAR_COLORS = ['#378ADD','#1D9E75','#BA7517','#D4537E','#534AB7','#E24B4A'];
 
   const curYear = new Date().getFullYear();
@@ -229,13 +267,14 @@
     localStorage.setItem(key(y, m), JSON.stringify(obj));
   }
 
-  function totalDep(d) { return d ? CATS.reduce((s, c) => s + (d[c] || 0), 0) : 0; }
+  function totalRev(d) { return d ? REV_CATS.reduce((s, c) => s + (d[c] || 0), 0) : 0; }
+  function totalDep(d) { return d ? DEP_CATS.reduce((s, c) => s + (d[c] || 0), 0) : 0; }
 
   function yearTotals(y) {
     let rev = 0, dep = 0;
     for (let m = 0; m < 12; m++) {
       const d = (data[y] || {})[m];
-      if (d) { rev += d.revenus || 0; dep += totalDep(d); }
+      if (d) { rev += totalRev(d); dep += totalDep(d); }
     }
     return { rev, dep, epargne: rev - dep };
   }
@@ -265,7 +304,11 @@
       const btn = document.createElement('button');
       btn.className = 'tab' + (y === currentYear ? ' active' : '');
       btn.textContent = y;
-      btn.onclick = () => { currentYear = y; buildYearTabs(); buildMonthTabs(); loadForm(); updateMetrics(); renderCharts(); if (currentView === 'annuel') { renderAnnualCharts(); updateAnnualMetrics(); } };
+      btn.onclick = () => {
+        currentYear = y; buildYearTabs(); buildMonthTabs(); loadForm();
+        updateMetrics(); updateTotals(); renderCharts();
+        if (currentView === 'annuel') { renderAnnualCharts(); updateAnnualMetrics(); }
+      };
       c.appendChild(btn);
     });
   }
@@ -276,21 +319,29 @@
       const btn = document.createElement('button');
       btn.className = 'tab' + (i === currentMonth ? ' active' : '');
       btn.textContent = name + (!!(data[currentYear] || {})[i] ? ' ✓' : '');
-      btn.onclick = () => { currentMonth = i; buildMonthTabs(); loadForm(); updateMetrics(); renderCharts(); };
+      btn.onclick = () => { currentMonth = i; buildMonthTabs(); loadForm(); updateMetrics(); updateTotals(); renderCharts(); };
       c.appendChild(btn);
     });
   }
 
   function loadForm() {
     const d = (data[currentYear] || {})[currentMonth] || {};
-    document.getElementById('revenus').value = d.revenus || '';
-    CATS.forEach(c => { document.getElementById(c).value = d[c] || ''; });
+    REV_CATS.forEach(c => { document.getElementById(c).value = d[c] || ''; });
+    DEP_CATS.forEach(c => { document.getElementById(c).value = d[c] || ''; });
   }
 
   function getForm() {
-    const obj = { revenus: parseFloat(document.getElementById('revenus').value) || 0 };
-    CATS.forEach(c => { obj[c] = parseFloat(document.getElementById(c).value) || 0; });
+    const obj = {};
+    REV_CATS.forEach(c => { obj[c] = parseFloat(document.getElementById(c).value) || 0; });
+    DEP_CATS.forEach(c => { obj[c] = parseFloat(document.getElementById(c).value) || 0; });
     return obj;
+  }
+
+  function updateTotals() {
+    const obj = getForm();
+    const rev = totalRev(obj), dep = totalDep(obj);
+    document.getElementById('totalRevDisplay').textContent = rev.toLocaleString('fr-FR') + ' €';
+    document.getElementById('totalDepDisplay').textContent = dep.toLocaleString('fr-FR') + ' €';
   }
 
   function saveMonth() {
@@ -303,10 +354,10 @@
 
   function updateMetrics() {
     const d = (data[currentYear] || {})[currentMonth] || {};
-    const rev = d.revenus || 0, dep = totalDep(d), ep = rev - dep;
+    const rev = totalRev(d), dep = totalDep(d), ep = rev - dep;
     const taux = rev > 0 ? ((ep / rev) * 100).toFixed(1) : '—';
     document.getElementById('metricsRow').innerHTML = `
-      <div class="metric"><div class="metric-label">Revenus (${MONTHS[currentMonth]})</div><div class="metric-value">${rev.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Revenus (${MONTHS[currentMonth]})</div><div class="metric-value positive">${rev.toLocaleString('fr-FR')} €</div></div>
       <div class="metric"><div class="metric-label">Dépenses (${MONTHS[currentMonth]})</div><div class="metric-value negative">${dep.toLocaleString('fr-FR')} €</div></div>
       <div class="metric"><div class="metric-label">Épargne</div><div class="metric-value ${ep >= 0 ? 'positive' : 'negative'}">${ep >= 0 ? '+' : ''}${ep.toLocaleString('fr-FR')} €</div></div>
       <div class="metric"><div class="metric-label">Taux d'épargne</div><div class="metric-value ${parseFloat(taux) >= 0 ? 'positive' : 'negative'}">${taux}%</div></div>`;
@@ -316,31 +367,46 @@
     const t = yearTotals(currentYear);
     const taux = t.rev > 0 ? ((t.epargne / t.rev) * 100).toFixed(1) : '—';
     document.getElementById('metricsAnnuel').innerHTML = `
-      <div class="metric"><div class="metric-label">Revenus ${currentYear}</div><div class="metric-value">${t.rev.toLocaleString('fr-FR')} €</div></div>
+      <div class="metric"><div class="metric-label">Revenus ${currentYear}</div><div class="metric-value positive">${t.rev.toLocaleString('fr-FR')} €</div></div>
       <div class="metric"><div class="metric-label">Dépenses ${currentYear}</div><div class="metric-value negative">${t.dep.toLocaleString('fr-FR')} €</div></div>
       <div class="metric"><div class="metric-label">Épargne ${currentYear}</div><div class="metric-value ${t.epargne >= 0 ? 'positive' : 'negative'}">${t.epargne >= 0 ? '+' : ''}${t.epargne.toLocaleString('fr-FR')} €</div></div>
       <div class="metric"><div class="metric-label">Taux d'épargne</div><div class="metric-value ${parseFloat(taux) >= 0 ? 'positive' : 'negative'}">${taux}%</div></div>`;
   }
 
-  let barChart, pieChart, annualBar, annualEpargne, annualLine;
+  let barChart, pieChart, pieRevChart, annualBar, annualEpargne, annualLine;
 
   function renderCharts() {
     const yData = data[currentYear] || {};
     const labels = [], revs = [], deps = [];
-    MONTHS.forEach((name, i) => { if (yData[i]) { labels.push(name); revs.push(yData[i].revenus || 0); deps.push(totalDep(yData[i])); } });
+    MONTHS.forEach((name, i) => {
+      if (yData[i]) { labels.push(name); revs.push(totalRev(yData[i])); deps.push(totalDep(yData[i])); }
+    });
+
     if (barChart) barChart.destroy();
     barChart = new Chart(document.getElementById('chartBar'), {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Revenus', data: revs, backgroundColor: '#378ADD' }, { label: 'Dépenses', data: deps, backgroundColor: '#E24B4A' }] },
+      data: { labels, datasets: [{ label: 'Revenus', data: revs, backgroundColor: '#1D9E75' }, { label: 'Dépenses', data: deps, backgroundColor: '#E24B4A' }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } }, scales: { x: { ticks: { autoSkip: false, font: { size: 11 } } } } }
     });
+
     const d = yData[currentMonth] || {};
-    document.getElementById('pieLegend').innerHTML = PIE_COLORS.map((col, i) =>
-      `<span class="legend-item"><span class="legend-dot" style="background:${col}"></span>${CAT_LABELS[i]}</span>`).join('');
+    const depData = DEP_CATS.map(c => d[c] || 0);
+    document.getElementById('pieLegend').innerHTML = DEP_COLORS.map((col, i) =>
+      `<span class="legend-item"><span class="legend-dot" style="background:${col}"></span>${DEP_LABELS[i]}</span>`).join('');
     if (pieChart) pieChart.destroy();
     pieChart = new Chart(document.getElementById('chartPie'), {
       type: 'doughnut',
-      data: { labels: CAT_LABELS, datasets: [{ data: CATS.map(c => d[c] || 0), backgroundColor: PIE_COLORS }] },
+      data: { labels: DEP_LABELS, datasets: [{ data: depData, backgroundColor: DEP_COLORS }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+
+    const revData = REV_CATS.map(c => d[c] || 0);
+    document.getElementById('pieRevLegend').innerHTML = REV_COLORS.map((col, i) =>
+      `<span class="legend-item"><span class="legend-dot" style="background:${col}"></span>${REV_LABELS[i]}</span>`).join('');
+    if (pieRevChart) pieRevChart.destroy();
+    pieRevChart = new Chart(document.getElementById('chartPieRev'), {
+      type: 'doughnut',
+      data: { labels: REV_LABELS, datasets: [{ data: revData, backgroundColor: REV_COLORS }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
   }
@@ -350,33 +416,46 @@
     const revs = years.map(y => yearTotals(y).rev);
     const deps = years.map(y => yearTotals(y).dep);
     const eps = years.map(y => yearTotals(y).epargne);
+
     document.getElementById('annualLegend').innerHTML = `
-      <span class="legend-item"><span class="legend-dot" style="background:#378ADD"></span>Revenus</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#1D9E75"></span>Revenus</span>
       <span class="legend-item"><span class="legend-dot" style="background:#E24B4A"></span>Dépenses</span>`;
+
     if (annualBar) annualBar.destroy();
     annualBar = new Chart(document.getElementById('chartAnnualBar'), {
       type: 'bar',
-      data: { labels: yLabels, datasets: [{ label: 'Revenus', data: revs, backgroundColor: '#378ADD' }, { label: 'Dépenses', data: deps, backgroundColor: '#E24B4A' }] },
+      data: { labels: yLabels, datasets: [{ label: 'Revenus', data: revs, backgroundColor: '#1D9E75' }, { label: 'Dépenses', data: deps, backgroundColor: '#E24B4A' }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
+
     if (annualEpargne) annualEpargne.destroy();
     annualEpargne = new Chart(document.getElementById('chartAnnualEpargne'), {
       type: 'bar',
       data: { labels: yLabels, datasets: [{ label: 'Épargne', data: eps, backgroundColor: eps.map(v => v >= 0 ? '#1D9E75' : '#E24B4A') }] },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
     });
+
     document.getElementById('lineAnnualLegend').innerHTML = years.map((y, i) =>
       `<span class="legend-item"><span class="legend-dot" style="background:${YEAR_COLORS[i % YEAR_COLORS.length]}"></span>${y}</span>`).join('');
+
     if (annualLine) annualLine.destroy();
     annualLine = new Chart(document.getElementById('chartAnnualLine'), {
       type: 'line',
-      data: { labels: MONTHS, datasets: years.map((y, idx) => ({ label: String(y), data: MONTHS.map((_, m) => (data[y] || {})[m] ? totalDep((data[y] || {})[m]) : null), borderColor: YEAR_COLORS[idx % YEAR_COLORS.length], backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, spanGaps: false })) },
+      data: {
+        labels: MONTHS,
+        datasets: years.map((y, idx) => ({
+          label: String(y),
+          data: MONTHS.map((_, m) => (data[y] || {})[m] ? totalDep((data[y] || {})[m]) : null),
+          borderColor: YEAR_COLORS[idx % YEAR_COLORS.length],
+          backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, spanGaps: false
+        }))
+      },
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { autoSkip: false, font: { size: 11 } } } } }
     });
   }
 
   function init() {
-    loadAll(); buildYearTabs(); buildMonthTabs(); loadForm(); updateMetrics(); renderCharts();
+    loadAll(); buildYearTabs(); buildMonthTabs(); loadForm(); updateMetrics(); updateTotals(); renderCharts();
   }
 
   if (sessionStorage.getItem('budget_auth') === '1') init();
